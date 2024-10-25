@@ -1,0 +1,148 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+        content="Página dedicada a la arqueología de Nariño, Colombia, con detalles sobre el complejo cerámico de Piartal, Quiyacingas y pastos.">
+    <title>Alfarería de Nariño</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/Styles.css' %}">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header-background">
+        <div class="header-content">
+            <img src="{% static 'images/logo-footer.png' %}" alt="Logo" class="header-logo">
+        </div>
+        <div class="header-title">
+            <h1 class="header-title">Alfarería Prehispánica de Nariño</h1>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-header">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'index' %}">Inicio</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+
+                    <!-- Dropdown para Periodo Histórico -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="periodoDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Periodo Histórico</a>
+                        <div class="dropdown-menu" aria-labelledby="periodoDropdown">
+                            <a class="dropdown-item"
+                                href="{% url 'index' %}?periodo={{ 'Piartal'|escape }}&q={{ request.GET.q|escape }}">Piartal</a>
+                            <a class="dropdown-item"
+                                href="{% url 'index' %}?periodo={{ 'Capulí'|escape }}&q={{ request.GET.q|escape }}">Capulí</a>
+                            <a class="dropdown-item"
+                                href="{% url 'index' %}?periodo={{ 'Tuza'|escape }}&q={{ request.GET.q|escape }}">Tuza</a>
+                        </div>
+                    </li>
+
+                    <!-- Dropdown para Técnica Cerámica -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="TecnicaDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Técnica Cerámica</a>
+                        <div class="dropdown-menu ">
+                            <a class='dropdown-item'
+                                href='{% url "tecnica_por_tipo" "tecnica_manufactura" %}?periodo={{ request.GET.periodo|escape }}&q={{ request.GET.q|escape }}'>Técnica
+                                Manufactura</a>
+                            <a class='dropdown-item'
+                                href='{% url "tecnica_por_tipo" "tipologia_ceramica" %}?periodo={{ request.GET.periodo|escape }}&q={{ request.GET.q|escape }}'>Tipología
+                                Cerámica</a>
+                            <a class='dropdown-item'
+                                href='{% url "tecnica_por_tipo" "decoracion_ceramica" %}?periodo={{ request.GET.periodo|escape }}&q={{ request.GET.q|escape }}'>Decoración
+                                Cerámica</a>
+                            <a class='dropdown-item'
+                                href='{% url "tecnica_por_tipo" "coccion_ceramica" %}?periodo={{ request.GET.periodo|escape }}&q={{ request.GET.q|escape }}'>Cocción
+                                Cerámica</a>
+                        </div>
+                    </li>
+                    <!-- Enlace al Mapa -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'map_view' %}">Mapa de Hallazgos</a>
+                    </li>
+
+
+                    <!-- Formulario de Búsqueda -->
+                    <li class='nav-item'>
+                        <form class='form-inline my-2 my-lg-0' method='get' action='{% url "index" %}'>
+                            {% csrf_token %}
+                            <input class='form-control mr-sm-2' type='search' placeholder='Buscar por forma o técnica'
+                                aria-label='Buscar' name='q' value="{{ query|escape }}">
+                            <input type='hidden' name='periodo' value='{{ request.GET.periodo|escape }}'>
+                            <button class='btn btn-outline-light my-2 my-sm-0' type='submit'>Buscar</button>
+                        </form>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class='container my-5'>
+        {% if tecnicas %}
+        <h2>Técnicas de {{ tipo|title }}</h2>
+        {% for tecnica in tecnicas %}
+        <div class='card mb-4'>
+            <div class='row no-gutters'>
+                <div class='col-md-4'>
+                    <img src="{{ tecnica.imagen.url }}" alt="{{ tecnica.descripcion|escape }}" class='card-img'>
+                </div>
+                <div class='col-md-8'>
+                    <div class='card-body'>
+                        <h5 class='card-title'>{{ tecnica.nombre}}</h5>
+                        <p>{{ tecnica.descripcion|escape }}</p> <!-- Descripción de la técnica -->
+                        <!-- Agrega más campos según sea necesario -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>No se encontraron técnicas disponibles para este tipo.</p> <!-- Mensaje si no hay técnicas -->
+        {% endif %}
+
+        <!-- Enlace para volver a la página principal o a la búsqueda -->
+        <a href="{% url 'index' %}" class="btn btn-primary">Volver a Inicio</a>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background-color: #000000f3; color: #fff; padding: 15px 0; text-align: center;">
+        &copy; 2024 Universidad De San Bueventura. Todos los derechos reservados.
+    </footer>
+
+    <!-- Scripts de Bootstrap y jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <!-- Asegúrate de usar la versión correcta según tu necesidad -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <!-- Popper.js es necesario para los dropdowns en Bootstrap 4 -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+        // Añadir el efecto de desvanecimiento
+        document.addEventListener("DOMContentLoaded", function () {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('show'); // Añadir clase para mostrar
+                }, index * 100); // Desfase en el tiempo para cada tarjeta
+            });
+        });
+    </script>
+</body>
+
+</html>

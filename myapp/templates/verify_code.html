@@ -1,0 +1,10 @@
+<form method="post">
+    {% csrf_token %}
+    <label for="code">Código de Verificación:</label>
+    <input type="text" name="code" required>
+
+    <button type="submit">Verificar Código</button>
+</form>
+{% if error %}
+<p>{{ error }}</p>
+{% endif %}

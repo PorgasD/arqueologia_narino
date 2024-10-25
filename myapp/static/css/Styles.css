@@ -1,0 +1,272 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa; /* Fondo claro para contraste */
+    color: #333; /* Color de texto por defecto */
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #000000f3; /* Marrón oscuro */
+    color: #fff; /* Texto blanco para contraste */
+    padding: 20px 0; /* Ajuste del espaciado del encabezado */
+    display: flex; /* Usa flexbox para alinear el contenido */
+    align-items: center; /* Alinea verticalmente el contenido */
+}
+
+.header-background {
+    background-image: url("/static/images/CIAO21T1PC-030.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 150px;
+}
+
+header h1, header p {
+    margin: 0;
+    padding: 0;
+}
+
+.header-logo {
+    max-width: 100px; /* Tamaño máximo del logo ajustado */
+    height: auto; /* Mantiene la proporción de la imagen */
+    margin-left: 20px; /* Espacio a la izquierda del logo (opcional) */
+}
+
+.navbar {
+    background-color: #000000f3; /* Mismo color que el encabezado */
+    padding: 1px 0; /* Espaciado en la barra de navegación */
+    border-radius: 0px; /* Bordes redondeados para el menú */
+}
+
+.navbar a.navbar-brand, .navbar-nav .nav-link {
+    color: #fff; /* Texto blanco en el navbar */
+}
+
+.navbar a.navbar-brand:hover, .navbar-nav .nav-link:hover {
+    color: #000000f3; /* Cambio a negro en hover */
+}
+
+footer {
+    background-color: #000000f3; /* Marrón oscuro para el pie de página */
+    color: #fff; /* Texto blanco */
+    padding: 15px 0;
+    text-align: center;
+}
+
+footer p {
+    margin: 0;
+}
+
+/* Main Content Styles */
+.container {
+    width: 90%;
+    margin: 0 auto;
+    max-width: 1200px;
+    padding: 20px;
+}
+
+h2 {
+    color: #8a5d2c; /* Naranja brillante para los encabezados */
+    border-bottom: 2px solid #975e20; /* Línea de separación en naranja */
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* Estilos para la cuadrícula de imágenes */
+.image-grid {
+    display: flex;
+    flex-direction: column; /* Asegura que las tarjetas se apilen verticalmente */
+}
+
+.card {
+    opacity: 0; /* Comienza invisible */
+    transform: translateX(-20px); /* Mueve la tarjeta ligeramente a la izquierda */
+    transition: opacity 0.5s ease, transform 0.5s ease; /* Transición suave */
+}
+
+.card.show {
+    opacity: 1; /* Hacer visible */
+    transform: translateX(0); /* Regresar a la posición original */
+}
+
+.image-item {
+    border: 1px solid #ccc; /* Borde alrededor de cada imagen */
+    padding: 10px; /* Espaciado interno */
+    background-color: #f9f9f9; /* Fondo opcional */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Opcional: sombra para un efecto de profundidad */
+    border-radius: 8px; /* Bordes redondeados */
+}
+
+/* Asegura que las imágenes se ajusten al contenedor */
+.image-item img {
+    max-width: 100%; /* Asegura que la imagen no exceda el ancho del contenedor */
+    height: auto; /* Mantiene la proporción de la imagen */
+}
+
+/* Estilos específicos para imágenes fluidas */
+.img-fluid {
+    max-width: 100%; /* Asegura que la imagen no exceda el contenedor */
+    height: auto; /* Mantiene la proporción de la imagen */
+    border: 2px solid #8c4d23; /* Borde marrón oscuro para las imágenes */
+    border-radius: 8px; /* Bordes redondeados */
+}
+
+/*estilo para el buscador*/
+.form-inline input[type="search"] {
+    background-color: rgba(0, 0, 0, 0.8); /* Negro con 80% de opacidad */
+    border: 1px solid #ccc; /* Borde gris claro */
+    color: #fff; /* Color del texto blanco */
+}
+
+.form-inline input[type="search"]:focus {
+    background-color: rgba(0, 0, 0, 1); /* Negro completamente opaco al hacer foco */
+    border-color: #007bff; /* Cambia el color del borde al azul */
+}
+
+/* Dropdown Styles */
+.navbar-nav {
+    background-color: transparent; /* Asegura que el fondo de la lista de navegación sea transparente */
+    padding: 0; /* Elimina el espaciado para alineación superior */
+}
+
+.nav-item {
+    position: relative; /* Necesario para posicionar el menú desplegable */
+}
+
+.nav-item .dropdown-toggle {
+    background-color: #00000000; /* Mismo color que el encabezado */
+    color: #fff; /* Color de texto blanco para contraste */
+    border-radius: 5px; /* Bordes redondeados */
+    padding: 10px; /* Espaciado interno */
+    border: none; /* Elimina el borde */
+}
+
+.dropdown-menu {
+    background-color: #000000f3; /* Mismo color que el encabezado */
+    border: none; /* Elimina el borde por defecto */
+    position: absolute; /* Posiciona el menú desplegable */
+    top: 100%; /* Coloca el menú justo debajo del botón */
+    left: 0; /* Alinea el menú a la izquierda del botón */
+    z-index: 1000; /* Asegura que el menú se muestra encima de otros elementos */
+    box-shadow: none; /* Elimina la sombra predeterminada para evitar un borde gris */
+}
+
+.dropdown-item {
+    color: #fff; /* Color de texto en el menú desplegable */
+}
+
+.dropdown-item:hover {
+    background-color: #6e3c16; /* Fondo al pasar el cursor */
+}
+
+.pagination {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.pagination .step-links a {
+    margin: 0 5px;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: #007bff;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+}
+
+.pagination .step-links a:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.pagination .step-links .current {
+    display: inline-block;
+    padding: 8px 12px;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Asegúrate de que el mapa tenga un tamaño adecuado */
+#map-container {
+    border: 2px solid #007bff; /* Borde del cuadro */
+    border-radius: 8px; /* Esquinas redondeadas */
+    overflow: hidden; /* Evita que el contenido se desborde */
+    margin: 20px 0; /* Espacio alrededor del contenedor */
+    height: 500px; /* Altura fija del contenedor */
+}
+
+#map {
+    height: 100%; /* El mapa ocupa todo el contenedor */
+    width: 100%; /* Ancho completo del contenedor */
+}
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .container {
+        width: 95%;
+    }
+}
+
+@media (max-width: 992px) {
+    .navbar-nav {
+        text-align: center;
+    }
+
+    .navbar-nav .nav-link {
+        padding: 10px 0;
+    }
+
+    .container {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .image-grid {
+        grid-template-columns: 1fr; /* Una sola columna en pantallas más pequeñas */
+    }
+}
+
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.5em;
+    }
+
+    .navbar {
+        padding: 10px 0;
+    }
+
+    .navbar a.navbar-brand {
+        font-size: 1.2em;
+    }
+
+    footer {
+        padding: 10px 0;
+    }
+
+    .container {
+        padding: 5px;
+    }
+
+    h2 {
+        font-size: 1.2em;
+    }
+}
+
+@media (max-width: 576px) {
+    header, footer {
+        padding: 8px 0;
+    }
+
+    .navbar a.navbar-brand {
+        font-size: 1em;
+    }
+
+    .navbar-nav .nav-link {
+        padding: 8px 0;
+    }
+
+    h2 {
+        font-size: 1em;
+    }
+}

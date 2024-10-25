@@ -1,0 +1,11 @@
+# Ignorar el entorno virtual
+.venv/
+myenv/
+
+# Ignorar archivos de configuración
+*.pyc
+__pycache__/
+*.sqlite3
+*.pem
+logs/
+media/

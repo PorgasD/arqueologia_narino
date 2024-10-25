@@ -1,0 +1,709 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description"
+    content="Página dedicada a la arqueología de Nariño, Colombia, con detalles sobre el complejo cerámico de Piartal, Quiyacingas y pastos.">
+  <title>Alfarería de Nariño</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'css/Styles.css' %}">
+  <!-- Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header-background">
+    <div class="header-content">
+      <img src="{% static 'images/logo-footer.png' %}" alt="Logo" class="header-logo">
+    </div>
+    <div class="header-title">
+      <h1 class="header-title">Alfarería Prehispánica de Nariño</h1>
+    </div>
+  </header>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-header">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'index' %}">Inicio</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+
+          <!-- Dropdown para Periodo Histórico -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="periodoDropdown" role="button" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">Periodo Histórico</a>
+            <div class="dropdown-menu" aria-labelledby="periodoDropdown">
+              <a class="dropdown-item"
+                href="{% url 'index' %}?periodo={{ 'Piartal'|escape }}&q={{ request.GET.q|escape }}">Piartal</a>
+              <a class="dropdown-item"
+                href="{% url 'index' %}?periodo={{ 'Capulí'|escape }}&q={{ request.GET.q|escape }}">Capulí</a>
+              <a class="dropdown-item"
+                href="{% url 'index' %}?periodo={{ 'Tuza'|escape }}&q={{ request.GET.q|escape }}">Tuza</a>
+            </div>
+          </li>
+
+          <!-- Dropdown para Técnica Cerámica -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="TecnicaDropdown" role="button" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">Técnica Cerámica</a>
+            <div class="dropdown-menu">
+              <a class='dropdown-item'
+                href='{% url "tecnica_por_tipo" "tecnica_manufactura" %}?periodo={{ request.GET.periodo|escape }}&q={{ request.GET.q|escape }}'>Técnica
+                Manufactura</a>
+              <a class='dropdown-item'
+                href='{% url "tecnica_por_tipo" "tipologia_ceramica" %}?periodo={{ request.GET.periodo|escape }}&q={{ request.GET.q|escape }}'>Tipología
+                Cerámica</a>
+              <a class='dropdown-item'
+                href='{% url "tecnica_por_tipo" "decoracion_ceramica" %}?periodo={{ request.GET.periodo|escape }}&q={{ request.GET.q|escape }}'>Decoración
+                Cerámica</a>
+              <a class='dropdown-item'
+                href='{% url "tecnica_por_tipo" "coccion_ceramica" %}?periodo={{ request.GET.periodo|escape }}&q={{ request.GET.q|escape }}'>Cocción
+                Cerámica</a>
+            </div>
+          </li>
+          <!-- Enlace al Mapa -->
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'map_view' %}">Mapa de Hallazgos</a>
+          </li>
+          <!-- Formulario de Búsqueda -->
+          <li class='nav-item'>
+            <form class='form-inline my-2 my-lg-0' method='get' action='{% url "index" %}'>
+              {% csrf_token %}
+              <input class='form-control mr-sm-2' type='search' placeholder='Buscar por forma o técnica'
+                aria-label='Buscar' name='q' value="{{ request.GET.q|escape }}">
+              <input type='hidden' name='periodo' value='{{ request.GET.periodo|escape }}'>
+              <!-- Mantener el periodo actual -->
+              <button class='btn btn-outline-light my-2 my-sm-0' type='submit'>Buscar</button>
+            </form>
+          </li>
+
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- Contenedor del Mapa -->
+  <div id="map-container">
+    <div id="map"></div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+    // Inicializar el mapa centrado en Pasto, Nariño
+    var map = L.map('map').setView([1.6089845122176494, -77.8171461396975], 8); // Centrar en Pasto
+
+    // Capa de OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Definir el GeoJSON para Nariño
+    var nariñoGeoJSON = {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -77.11462612291932,
+              0.37836616477575546
+            ],
+            [
+              -77.08824314163353,
+              0.3960502410498634
+            ],
+            [
+              -77.0993338078594,
+              0.4141979977108434
+            ],
+            [
+              -77.08623072270635,
+              0.4252904363059855
+            ],
+            [
+              -77.10034201595974,
+              0.434361951714223
+            ],
+            [
+              -77.1184942197985,
+              0.4555360605277059
+            ],
+            [
+              -77.09835246933356,
+              0.4666329910900373
+            ],
+            [
+              -77.10341286925988,
+              0.48276515839346246
+            ],
+            [
+              -77.1214128470172,
+              0.5049303487459014
+            ],
+            [
+              -77.13263283175729,
+              0.5593635955442693
+            ],
+            [
+              -77.1155035141211,
+              0.5644003138609008
+            ],
+            [
+              -77.11656477722144,
+              0.5835143514714929
+            ],
+            [
+              -77.1266977183153,
+              0.5995804176355932
+            ],
+            [
+              -77.14894340481702,
+              0.6075177480927039
+            ],
+            [
+              -77.19231341786009,
+              0.6292172491732515
+            ],
+            [
+              -77.14008213799609,
+              0.8185318540219555
+            ],
+            [
+              -77.10626156416649,
+              0.8306622929921303
+            ],
+            [
+              -77.11724396701634,
+              0.8779902144258926
+            ],
+            [
+              -77.12254436935318,
+              0.8932567814420764
+            ],
+            [
+              -77.10944063089218,
+              0.903362305398332
+            ],
+            [
+              -77.09348090620833,
+              0.9178309107146987
+            ],
+            [
+              -77.0741137688652,
+              0.9455790506984414
+            ],
+            [
+              -77.07860232032228,
+              0.9636010276581999
+            ],
+            [
+              -77.0502012333725,
+              0.9761087899749157
+            ],
+            [
+              -77.03177913134513,
+              0.9978355023782086
+            ],
+            [
+              -77.02729967828367,
+              1.0210839362052013
+            ],
+            [
+              -77.03986097756932,
+              1.0451203506651439
+            ],
+            [
+              -77.05812344731731,
+              1.0367829114637175
+            ],
+            [
+              -77.07073967275022,
+              1.0577676247316816
+            ],
+            [
+              -77.08469811253022,
+              1.0625123131330412
+            ],
+            [
+              -77.09979463103441,
+              1.1327380309733002
+            ],
+            [
+              -77.08874995859308,
+              1.1856852684532981
+            ],
+            [
+              -77.01604954126826,
+              1.1991024988897152
+            ],
+            [
+              -76.97809912362474,
+              1.2300845300225234
+            ],
+            [
+              -76.96951045568278,
+              1.2559339243644843
+            ],
+            [
+              -76.98233796496918,
+              1.284640412131992
+            ],
+            [
+              -76.96731518380984,
+              1.2945224075319572
+            ],
+            [
+              -76.95923091560472,
+              1.2747747139994061
+            ],
+            [
+              -76.9342106711964,
+              1.2738292187604827
+            ],
+            [
+              -76.92800473347742,
+              1.2960751067660539
+            ],
+            [
+              -76.904778454045,
+              1.3197741952176187
+            ],
+            [
+              -76.92208513764601,
+              1.3458932985951861
+            ],
+            [
+              -76.92240063297112,
+              1.5030177268605769
+            ],
+            [
+              -76.86223039103825,
+              1.5311593739326526
+            ],
+            [
+              -76.85181729950611,
+              1.5727855430838673
+            ],
+            [
+              -76.83014653379665,
+              1.6197689838774068
+            ],
+            [
+              -76.90189686452436,
+              1.6650457392903633
+            ],
+            [
+              -76.93762818945135,
+              1.7376049596243206
+            ],
+            [
+              -76.99008393409568,
+              1.7068479570034611
+            ],
+            [
+              -77.02524766598981,
+              1.7187133427294299
+            ],
+            [
+              -77.05781592016625,
+              1.702432508655761
+            ],
+            [
+              -77.0795831185487,
+              1.6734119345186116
+            ],
+            [
+              -77.13035390069268,
+              1.6571046826993978
+            ],
+            [
+              -77.15112798468607,
+              1.6852947495997341
+            ],
+            [
+              -77.24020847165819,
+              1.663453386683173
+            ],
+            [
+              -77.28286034014928,
+              1.671642960785661
+            ],
+            [
+              -77.32651489687281,
+              1.686254536462755
+            ],
+            [
+              -77.29834913615821,
+              1.7615892562842248
+            ],
+            [
+              -77.30654014619147,
+              1.8187274394903312
+            ],
+            [
+              -77.26110308074344,
+              1.864160012200955
+            ],
+            [
+              -77.24282816702035,
+              1.9188068368794688
+            ],
+            [
+              -77.1999569840686,
+              1.947191122403055
+            ],
+            [
+              -77.21554734213896,
+              1.99149060643677
+            ],
+            [
+              -77.26747648794843,
+              1.999322368759124
+            ],
+            [
+              -77.32930502787526,
+              2.0585193202885392
+            ],
+            [
+              -77.29758501201505,
+              2.11736760279409
+            ],
+            [
+              -77.31753042591244,
+              2.1933315459506844
+            ],
+            [
+              -77.35648930058404,
+              2.257543293750615
+            ],
+            [
+              -77.45989388147264,
+              2.2838886553977176
+            ],
+            [
+              -77.48715943684614,
+              2.2569129471068408
+            ],
+            [
+              -77.48903193036159,
+              2.188221438193551
+            ],
+            [
+              -77.54006313993985,
+              2.1996789728420083
+            ],
+            [
+              -77.59397203400142,
+              2.1848687590608904
+            ],
+            [
+              -77.62955853024283,
+              2.1695701350262766
+            ],
+            [
+              -77.69165986827416,
+              2.1480023077700423
+            ],
+            [
+              -77.76005201619894,
+              2.1435225414284957
+            ],
+            [
+              -77.81208381785409,
+              2.1791464800683116
+            ],
+            [
+              -77.8431267312941,
+              2.1864935845145084
+            ],
+            [
+              -77.86048806675848,
+              2.225713748567472
+            ],
+            [
+              -77.85136713528736,
+              2.262149387988586
+            ],
+            [
+              -77.8842408769145,
+              2.3095917820365344
+            ],
+            [
+              -77.90251211489951,
+              2.4007504405896043
+            ],
+            [
+              -77.9335417059992,
+              2.51741294965079
+            ],
+            [
+              -77.92080871343965,
+              2.6377339940878954
+            ],
+            [
+              -78.20773834556651,
+              2.6785239802209446
+            ],
+            [
+              -78.43388354980604,
+              2.5838834145259852
+            ],
+            [
+              -78.59257704867369,
+              2.4089540521562895
+            ],
+            [
+              -78.68925686590393,
+              2.2194255189769194
+            ],
+            [
+              -78.71021665426886,
+              2.1294024276815833
+            ],
+            [
+              -78.66206693673911,
+              2.1103240763347912
+            ],
+            [
+              -78.68114568275155,
+              2.0712871615293693
+            ],
+            [
+              -78.66388477751653,
+              2.041319636803337
+            ],
+            [
+              -78.67479056932383,
+              1.9723247969743198
+            ],
+            [
+              -78.63754022088581,
+              2.0022708442038493
+            ],
+            [
+              -78.59121139630658,
+              1.9868246739119968
+            ],
+            [
+              -78.60120546515301,
+              1.9477873562545085
+            ],
+            [
+              -78.5939425633589,
+              1.8969495431375663
+            ],
+            [
+              -78.53671458251128,
+              1.896027318079902
+            ],
+            [
+              -78.57305978503909,
+              1.7780183506056346
+            ],
+            [
+              -78.68116367138362,
+              1.780755931460888
+            ],
+            [
+              -78.85649673702196,
+              1.8270813733371227
+            ],
+            [
+              -79.00207187937433,
+              1.6334514277693586
+            ],
+            [
+              -78.84925555291395,
+              1.4551770165979576
+            ],
+            [
+              -78.77202441703201,
+              1.3961272388655743
+            ],
+            [
+              -78.7075060282674,
+              1.3624980095567452
+            ],
+
+            [
+              -78.69592851850554,
+              1.3385816935603145
+            ],
+            [
+              -78.73177591493838,
+              1.368885133132551
+            ],
+            [
+              -78.62562637490629,
+              1.2600684817428913
+            ],
+            [
+              -78.50714041965759,
+              1.1885885941763377
+            ],
+            [
+              -78.42863042755556,
+              1.1900520281877789
+            ],
+            [
+              -78.41904118741377,
+              1.1364376728549246
+            ],
+            [
+              -78.35160449921763,
+              1.1875152057508416
+            ],
+            [
+              -78.31026271420261,
+              1.2012567173393194
+            ],
+            [
+              -78.2652503658194,
+              1.0903676514855647
+            ],
+            [
+              -78.26670968287921,
+              1.045094590373978
+            ],
+            [
+              -78.19150457576367,
+              0.9838874180579182
+            ],
+            [
+              -78.1958076377471,
+              0.9443115517563001
+            ],
+            [
+              -78.1176016931805,
+              0.9321120558216052
+            ],
+            [
+              -77.99906461166741,
+              0.8523270721272098
+            ],
+            [
+              -77.84578339857744,
+              0.8117318783529015
+            ],
+            [
+              -77.71760355684573,
+              0.8506497316237898
+            ],
+            [
+              -77.67630049546615,
+              0.8230651193424023
+            ],
+            [
+              -77.70945505851118,
+              0.7657621935570376
+            ],
+            [
+              -77.65305262063903,
+              0.7148384851543312
+            ],
+            [
+              -77.56162783669394,
+              0.6426137900880633
+            ],
+            [
+              -77.47772875747998,
+              0.6602400037427145
+            ],
+            [
+              -77.48698569538274,
+              0.6173819557783702
+            ],
+            [
+              -77.52260611408519,
+              0.40850407768471086
+            ],
+            [
+              -77.42991578962831,
+              0.4504468725089197
+            ],
+            [
+              -77.36135607544976,
+              0.3901007356394075
+            ],
+            [
+              -77.2683292169824,
+              0.37690026807521804
+            ],
+            [
+              -77.16952165813882,
+              0.3938462424051039
+            ],
+            [
+              -77.10871781911904,
+              0.3826596404448992
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Nariño"
+      }
+    };
+
+
+    // Añadir el polígono al mapa
+    L.geoJSON(nariñoGeoJSON, {
+      style: {
+        color: 'blue',
+        weight: 2,
+        fillOpacity: 0.3
+      }
+    }).addTo(map);
+
+    // Cargar los hallazgos desde la API
+    fetch('/api/hallazgos/')
+      .then(response => response.json())
+      .then(hallazgos => {
+        hallazgos.forEach(function (hallazgo) {
+          L.marker([hallazgo.latitud, hallazgo.longitud]).addTo(map)
+            .bindPopup(hallazgo.nombre);
+        });
+      })
+      .catch(error => console.error('Error al cargar los hallazgos:', error));
+  </script>
+
+  <!-- Footer -->
+  <footer style="background-color: #000000f3; color: #fff; padding: 15px 0; text-align: center;">
+    &copy; 2024 Universidad De San Bueventura. Todos los derechos reservados.
+  </footer>
+
+  <!-- Scripts de Bootstrap y jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <!-- Asegúrate de usar la versión correcta según tu necesidad -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <!-- Popper.js es necesario para los dropdowns en Bootstrap 4 -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <script>
+    // Añadir el efecto de desvanecimiento
+    document.addEventListener("DOMContentLoaded", function () {
+      const cards = document.querySelectorAll('.card');
+      cards.forEach((card, index) => {
+        setTimeout(() => {
+          card.classList.add('show'); // Añadir clase para mostrar
+        }, index * 500); // Desfase en el tiempo para cada tarjeta
+      });
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,232 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+        content="Página dedicada a la arqueología de Nariño, Colombia, con detalles sobre el complejo cerámico de Piartal, Quiyacingas y pastos.">
+    <title>Alfarería de Nariño</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/Styles.css' %}">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header-background">
+        <div class="header-content">
+            <img src="{% static 'images/logo-footer.png' %}" alt="Logo" class="header-logo">
+        </div>
+        <div class="header-title">
+            <h1 class="header-title">Alfarería Prehispánica de Nariño</h1>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-header">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'index' %}">Inicio</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+
+
+                    <!-- Dropdown para Periodo Histórico -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="periodoDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Periodo Histórico</a>
+                        <div class="dropdown-menu" aria-labelledby="periodoDropdown">
+                            <a class="dropdown-item"
+                                href="?periodo={{ 'Piartal'|escape }}&q=">Piartal</a>
+                            <a class="dropdown-item"
+                                href="?periodo={{ 'Capulí'|escape }}&q=">Capulí</a>
+                            <a class="dropdown-item"
+                                href="?periodo={{ 'Tuza'|escape }}&q=">Tuza</a>
+                        </div>
+                    </li>
+                    <!-- Dropdown para Técnica Cerámica -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="TecnicaDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Técnica Cerámica</a>
+                        <div class="dropdown-menu">
+                            <a class='dropdown-item'
+                                href='{% url "tecnica_por_tipo" "tecnica_manufactura" %}?periodo={{ request.GET.periodo|escape }}&q={{ request.GET.q|escape }}'>Técnica
+                                Manufactura</a>
+                            <a class='dropdown-item'
+                                href='{% url "tecnica_por_tipo" "tipologia_ceramica" %}?periodo={{ request.GET.periodo|escape }}&q={{ request.GET.q|escape }}'>Tipología
+                                Cerámica</a>
+                            <a class='dropdown-item'
+                                href='{% url "tecnica_por_tipo" "decoracion_ceramica" %}?periodo={{ request.GET.periodo|escape }}&q={{ request.GET.q|escape }}'>Decoración
+                                Cerámica</a>
+                            <a class='dropdown-item'
+                                href='{% url "tecnica_por_tipo" "coccion_ceramica" %}?periodo={{ request.GET.periodo|escape }}&q={{ request.GET.q|escape }}'>Cocción
+                                Cerámica</a>
+                        </div>
+                    </li>
+
+                    <!-- Enlace al Mapa -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'map_view' %}">Mapa de Hallazgos</a>
+                    </li>
+
+                    <!-- Formulario de Búsqueda -->
+                    <li class='nav-item'>
+                        <form class='form-inline my-2 my-lg-0' method='get' action='{% url "index" %}'>
+                            {% csrf_token %}
+                            <input class='form-control mr-sm-2' type='search' placeholder='Buscar por forma o técnica'
+                                aria-label='Buscar' name='q' value="{{ request.GET.q|escape }}">
+                            <input type='hidden' name='periodo' value='{{ request.GET.periodo|escape }}'>
+                            <!-- Mantener el periodo actual -->
+                            <button class='btn btn-outline-light my-2 my-sm-0' type='submit'>Buscar</button>
+                        </form>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class='container my-5'>
+        {% if not query and not periodo %}
+        <!-- Mostrar Noticias Generales -->
+        <!-- Mostrar Noticias -->
+        <section>
+            <h2>Noticias</h2>
+            {% for noticia in noticias %}
+            <div class="card mb-3">
+                <div class="row no-gutters">
+                    <div class="col-md-4">
+                        {% if noticia.imagen %}
+                        <img src="{{ noticia.imagen|escape }}" alt="{{ noticia.titulo|escape }}" class="card-img">
+                        {% else %}
+                        <img src="{% static 'images/default.jpg' %}" alt="Imagen por defecto" class="card-img">
+                        <!-- Imagen por defecto si no hay -->
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ noticia.titulo|escape }}</h5>
+                            <p class="card-text">{{ noticia.contenido|escape }}</p>
+                            <a href="{{ noticia.enlace|escape }}" class="btn btn-primary" target="_blank">Leer más</a>
+                            <p class="card-text"><small class="text-muted">Publicado el {{ noticia.fecha_publicacion|date:"d M Y" }}</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>No hay noticias disponibles.</p>
+            {% endfor %}
+        </section>
+        {% else %}
+        <!-- Resultados de Búsqueda -->
+        {% if query %}
+        <h3>Resultados para: "{{ query }}"</h3>
+        {% endif %}
+
+        <!-- Mostrar Imágenes -->
+        {% if page_obj %}
+        <div class='image-grid'>
+            {% for imagen in page_obj %}
+            <div class='card mb-4 fade-in'>
+                <div class='row no-gutters'>
+                    <div class='col-md-4'>
+                        <img src="{{ imagen.imagen.url|escape }}" alt="{{ imagen.descripcion|escape }}"
+                            class='card-img'>
+                    </div>
+                    <div class='col-md-8'>
+                        <div class='card-body'>
+                            <h5 class='card-title'>{{ imagen.complejo_ceramico }}</h5>
+                            <p><strong>Descripción:</strong> {{ imagen.descripcion }}</p>
+                            {% if imagen.departamento %}
+                            <p><strong>Departamento, corregimiento:</strong> {{ imagen.departamento|escape }}, {{ imagen.corregimiento|escape }}</p>
+                            {% endif %}
+                            {% if imagen.forma %}
+                            <p><strong>Forma,altuta y cocción:</strong> {{ imagen.forma|escape }} - {{imagen.altura_total|escape }}cm - {{ imagen.coccion|escape }}</p>
+                            {% endif %}
+                            {% if imagen.acabado_superficie %}
+                            <p><strong>Acabado de superficie:</strong> {{ imagen.acabado_superficie|escape }}</p>
+                            {% endif %}
+                            {% if imagen.tecnica_manufactura %}
+                            <p><strong>Tecnica de manufactura:</strong> {{ imagen.tecnica_manufactura|escape }}</p>
+                            {% endif %}
+                            {% if imagen.autor %}
+                            <p><strong>Autor:</strong> {{ imagen.autor|escape }}</p>
+                            {% endif %}
+                            <!-- Agrega más atributos según sea necesario -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Controles de Paginación -->
+        {% if page_obj.has_previous or page_obj.has_next %}
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link"
+                        href="?page=1&q={{ query }}&periodo={{ periodo|escape }}">Primera</a></li>
+                <li class="page-item"><a class="page-link"
+                        href="?page={{ page_obj.previous_page_number }}&q={{ query|escape }}&periodo={{ periodo|escape }}">Anterior</a>
+                </li>
+                {% endif %}
+
+                <!-- Mostrar número de página actual -->
+                <li class="page-item disabled"><span class="page-link">Página {{ page_obj.number }} de {{page_obj.paginator.num_pages }}</span></li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link"
+                        href="?page={{ page_obj.next_page_number }}&q={{ query}}&periodo={{ periodo|escape }}">Siguiente</a>
+                </li>
+                <li class="page-item"><a class="page-link"
+                        href="?page={{ page_obj.paginator.num_pages }}&q={{ query|escape }}&periodo={{ periodo|escape }}">Última</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        {% if query or periodo %}
+        <p>No se encontraron imágenes.</p>
+        {% endif %}
+        {% endif %}
+
+        <!-- Mostrar Técnicas Cerámicas -->
+        {% if tecnicas %}
+        ...
+        {% else %}
+        {% if query or periodo %}
+        ...
+        {% endif %}
+        {% endif %}
+
+        {% endif %}
+
+    </main>
+
+    <!-- Footer -->
+    <footer style="background-color: #000000f3; color: #fff; padding: 15px 0; text-align: center;">
+        &copy; 2024 Universidad De San Bueventura. Todos los derechos reservados.
+    </footer>
+
+    <!-- Scripts de Bootstrap y jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <!-- Asegúrate de usar la versión correcta según tu necesidad -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <!-- Popper.js es necesario para los dropdowns en Bootstrap 4 -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>
+</body>
+
+</html>

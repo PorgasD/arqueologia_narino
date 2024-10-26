@@ -10,7 +10,7 @@ Este proyecto está dedicado a la investigación y documentación de la alfarer�
 ## Tecnologías Utilizadas
 - Django
 - Bootstrap
--SQLite
+- SQLite
 
 ## Instalación
 

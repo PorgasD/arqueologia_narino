@@ -30,7 +30,10 @@ Este proyecto está dedicado a la investigación y documentación de la alfarer�
     source venv/bin/activate  # En Windows usa `venv\Scripts\activate`
     pip install -r requirements.txt
     ```
-
+3.1 Carga las noticias de NewsAPI
+    ```bash
+    python manage.py fetch_news  
+    ```
 4. Realiza las migraciones:
     ```bash
     python manage.py migrate
